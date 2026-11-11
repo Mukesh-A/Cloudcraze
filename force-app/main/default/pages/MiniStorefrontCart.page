@@ -1,0 +1,553 @@
+<apex:page showHeader="false"
+           sidebar="false"
+           standardStylesheets="false"
+           docType="html-5.0"
+           applyHtmlTag="false"
+           applyBodyTag="false">
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0"/>
+
+    <title>My Shopping Cart</title>
+
+    <style>
+
+/* =========================
+   GLOBAL STYLES
+========================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f4f6f9;
+    color: #243040;
+    line-height: 1.5;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.store-header {
+    background: linear-gradient(135deg, #014486, #0176d3);
+    color: white;
+    padding: 25px 20px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.store-header h1 {
+    font-size: 28px;
+}
+
+/* =========================
+   MAIN CONTAINER
+========================= */
+
+.store-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.store-container h2 {
+    font-size: 25px;
+    margin-bottom: 25px;
+    color: #181818;
+}
+
+/* =========================
+   CART ITEMS
+========================= */
+
+#cart-container {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.cart-item {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.06);
+    border: 1px solid #e8edf3;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.cart-product-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.cart-product-image {
+    width: 85px;
+    height: 85px;
+    background: #eaf3fc;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 35px;
+    overflow: hidden;
+}
+    
+.cart-product-image img{
+     width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+
+.cart-product-info h3 {
+    margin-bottom: 8px;
+    color: #181818;
+}
+
+.cart-product-info p {
+    color: #666;
+}
+
+/* =========================
+   ITEM DETAILS
+========================= */
+
+.cart-item-details {
+    text-align: right;
+    line-height: 1.8;
+}
+
+.cart-subtotal {
+    font-size: 19px;
+    font-weight: bold;
+    color: #0176d3;
+}
+
+/* =========================
+   QUANTITY CONTROLS
+========================= */
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.quantity-controls button {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #0176d3;
+    background: white;
+    color: #0176d3;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.quantity-controls button:hover {
+    background: #eaf3fc;
+}
+
+.quantity-controls span {
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+}
+
+/* =========================
+   REMOVE PRODUCT
+========================= */
+
+.remove-product {
+    border: none;
+    background: none;
+    color: #d32f2f;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.remove-product:hover {
+    text-decoration: underline;
+}
+
+/* =========================
+   CART TOTAL
+========================= */
+
+#cart-total {
+    margin-top: 25px;
+    padding: 22px;
+    background: white;
+    border-radius: 10px;
+    text-align: right;
+    font-size: 23px;
+    font-weight: bold;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+#continue-shopping {
+    margin-top: 20px;
+    padding: 13px 22px;
+    background-color: #0176d3;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#continue-shopping:hover {
+    background-color: #005fb2;
+}
+
+/* =========================
+   EMPTY CART
+========================= */
+
+.empty-cart {
+    background: white;
+    padding: 40px;
+    text-align: center;
+    border-radius: 10px;
+    color: #666;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+
+@media (max-width: 600px) {
+
+    .header-content {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .store-header h1 {
+        font-size: 23px;
+    }
+
+    .store-container {
+        margin: 25px auto;
+        padding: 0 14px;
+    }
+
+    .cart-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .cart-item-details {
+        width: 100%;
+        text-align: left;
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+    }
+
+    .quantity-controls {
+        justify-content: flex-start;
+    }
+
+    #cart-total {
+        font-size: 19px;
+    }
+}
+
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+
+    <header class="store-header">
+        <div class="header-content">
+            <h1>My Shopping Cart</h1>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+
+    <main class="store-container">
+
+        <h2>Your Cart Items</h2>
+
+        <div id="cart-container"></div>
+
+        <h3 id="cart-total">Total: ₹0</h3>
+
+        <button id="continue-shopping">
+            Continue Shopping
+        </button>
+
+    </main>
+
+    <!-- HANDLEBARS TEMPLATE -->
+
+    <script id="cart-template"
+            type="text/x-handlebars-template">
+
+        {{#each products}}
+
+        <div class="cart-item">
+
+            <div class="cart-product-info">
+
+                <div class="cart-product-image">
+                    {{#if imageUrl}}
+                        <img src="{{imageUrl}}" alt="{{name}}"/>
+                    {{else}}
+                    🛍️
+                    {{/if}}
+                </div>
+
+                <div>
+                    <h3>{{name}}</h3>
+
+                    <p>Price: ₹{{price}}</p>
+                </div>
+
+            </div>
+
+            <div class="cart-item-details">
+
+                <div class="quantity-controls">
+
+                    <button data-action="decrease"
+                            data-id="{{id}}">
+                        -
+                    </button>
+
+                    <span>{{quantity}}</span>
+
+                    <button data-action="increase"
+                            data-id="{{id}}">
+                        +
+                    </button>
+
+                </div>
+
+                <p class="cart-subtotal">
+                    Subtotal: ₹{{subtotal}}
+                </p>
+
+                <button class="remove-product"
+                        data-action="remove"
+                        data-id="{{id}}">
+                    Remove
+                </button>
+
+            </div>
+
+        </div>
+
+        {{/each}}
+
+    </script>
+
+    <!-- HANDLEBARS LIBRARY -->
+
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.8/dist/handlebars.min.js"></script>
+
+    <!-- CART JAVASCRIPT -->
+
+    <script>
+
+        const cartContainer =
+            document.getElementById('cart-container');
+
+        const cartTotal =
+            document.getElementById('cart-total');
+
+        const cartSource =
+            document.getElementById('cart-template').innerHTML;
+
+        const cartTemplate =
+            Handlebars.compile(cartSource);
+
+        // Read cart from localStorage
+
+        let savedCart = JSON.parse(
+            localStorage.getItem('cart') || '[]'
+        );
+
+        let cart = new Map(savedCart);
+
+        // Format price
+
+        function formatPrice(price) {
+
+            return Number(price).toLocaleString('en-IN', {
+                maximumFractionDigits: 2
+            });
+
+        }
+
+        // Display cart products
+
+        function renderCart() {
+
+            const products = [];
+
+            let total = 0;
+
+            for (const [id, product] of cart.entries()) {
+
+                const subtotal =
+                    Number(product.price) *
+                    Number(product.quantity);
+
+                total += subtotal;
+
+                products.push({
+
+                    id: id,
+                    name: product.name,
+                    price: formatPrice(product.price),
+                    quantity: product.quantity,
+                    imageUrl: product.imageUrl,
+                    subtotal: formatPrice(subtotal)
+
+                });
+
+            }
+
+            // Check whether cart is empty
+
+            if (products.length === 0) {
+
+                cartContainer.innerHTML = `
+                    <div class="empty-cart">
+                        <h3>Your cart is empty!</h3>
+                        <p>Add some products to continue shopping.</p>
+                    </div>
+                `;
+
+                cartTotal.textContent = 'Total: ₹0';
+
+                return;
+
+            }
+
+            // Render Handlebars template
+            
+
+            cartContainer.innerHTML =
+                cartTemplate({ products });
+
+            // Display total
+
+            cartTotal.textContent =
+                'Total: ₹' + formatPrice(total);
+
+        }
+
+        // Save cart to localStorage
+
+        function saveCart() {
+
+            localStorage.setItem(
+                'cart',
+                JSON.stringify([...cart])
+            );
+
+        }
+
+        // Handle quantity and remove buttons
+
+        cartContainer.addEventListener('click', function(event) {
+
+            const button = event.target.closest('button[data-action]');
+
+            if (!button || !cartContainer.contains(button)) {
+                return;
+            }
+
+            const productId = button.dataset.id;
+
+            const action = button.dataset.action;
+
+            const product = cart.get(productId);
+
+            if (!product) {
+                return;
+            }
+
+            if (action === 'increase') {
+
+                product.quantity++;
+
+            }
+
+            else if (action === 'decrease') {
+
+                product.quantity--;
+
+                if (product.quantity <= 0) {
+                    cart.delete(productId);
+                }
+
+            }
+
+            else if (action === 'remove') {
+
+                cart.delete(productId);
+
+            }
+
+            saveCart();
+
+            renderCart();
+
+        });
+
+        // Continue shopping navigation
+
+        document.getElementById('continue-shopping')
+            .addEventListener('click', function() {
+
+                window.location.href =
+                    '/apex/MiniStorefrontHome';
+
+            });
+
+        // Initial cart rendering
+
+        renderCart();
+
+    </script>
+
+</body>
+</html>
+
+</apex:page>
