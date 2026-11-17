@@ -2,7 +2,8 @@
            sidebar="false"
            standardStylesheets="false"
            docType="html-5.0"
-           applyHtmlTag="false"
+           applyHtmlTag="false"    controller="CloudCrazeProductTestController"
+    extensions="CloudCrazeCartController"
            applyBodyTag="false">
 
 <html lang="en">
@@ -401,8 +402,13 @@ body {
             localStorage.getItem('cart') || '[]'
         );
 
-        let cart = new Map(savedCart);
+       
+        
 
+        let cart = new Map(savedCart);
+        console.log("cart iy", cart);
+        
+        fetchCartItem();
         // Format price
 
         function formatPrice(price) {
@@ -483,6 +489,7 @@ body {
 
         }
 
+       
         // Handle quantity and remove buttons
 
         cartContainer.addEventListener('click', function(event) {
@@ -504,18 +511,23 @@ body {
             }
 
             if (action === 'increase') {
-
                 product.quantity++;
+                renderCart();
+                updateItemQuantity(product, product.quantity);
+                
+
 
             }
 
             else if (action === 'decrease') {
+                if (product.quantity <= 1) {
+                   return;
+                }
 
                 product.quantity--;
-
-                if (product.quantity <= 0) {
-                    cart.delete(productId);
-                }
+                renderCart();
+                updateItemQuantity(product, product.quantity);
+                
 
             }
 
@@ -544,6 +556,61 @@ body {
         // Initial cart rendering
 
         renderCart();
+
+        function fetchCartItem(){
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.CloudCrazeCartController.getCartItems}',
+                function(result,event){
+                    if(event.status &&result && result.success){
+                      result.items.forEach(function(item){
+                        const productid = String(item.productId);
+                        
+
+                        cart.set(productid, {
+                            cartItemId: item.cartItemId,
+                            name: item.productName,
+                            price: item.price,
+                            quantity: Number(item.quantity),
+                            imageUrl: item.imageUrl
+                        });
+                      });
+                      
+                      saveCart();
+                        renderCart();
+                        console.log('cloudcraze cart itemsss',result);
+                    }
+                    else{
+                        console.error('cart error', event.message);
+                        
+                    }
+                }
+            )
+        }
+
+        function updateItemQuantity(product, newQuantity){
+            Visualforce.remoting.Manager.invokeAction(
+        '{!$RemoteAction.CloudCrazeCartController.updateCartItemQuantity}',
+            product.cartItemId,
+            newQuantity,
+            function (result,event){
+                if(event.status && result && result.success){
+                    console.log('CloudCraze quantity updated:', result);
+
+                    // Save only after Salesforce confirms success
+                    saveCart();
+                    renderCart();
+                }
+                else{
+                    console.error('Quantify update failed', result ? result.message : event.message);
+                      alert('Unable to update cart quantity in Salesforce.');
+
+                    // Restore the previous quantity from Salesforce
+                    fetchCartItem();
+                }
+            }
+            )
+        }
+
 
     </script>
 
